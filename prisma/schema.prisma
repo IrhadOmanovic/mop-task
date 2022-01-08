@@ -1,0 +1,115 @@
+// // This is your Prisma schema file,
+// // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+// model Question {
+//   id        Int     @default(autoincrement()) @id
+//   title     String?
+//   content   String?
+//   createdAt DateTime  @default(now()) @map(name: "created_at")
+//   author    User?   @relation(fields: [authorId], references: [id])
+//   authorId  Int?
+//   responses Response[]
+//   ratings   Rating[]
+// }
+
+// model Response {
+//   id          Int     @default(autoincrement()) @id
+//   content     String?
+//   createdAt   DateTime  @default(now()) @map(name: "created_at")
+//   question    Question?   @relation(fields: [questionId], references: [id])
+//   questionId  Int?
+//   author      User?   @relation(fields: [authorId], references: [id])
+//   authorId    Int?
+//   ratings     Rating[]
+// }
+
+// model Rating {
+//   id          Int     @default(autoincrement()) @id
+//   rating      Boolean @default(false)
+//   question    Question   @relation(fields: [questionId], references: [id])
+//   questionId  Int
+//   author      User?   @relation(fields: [authorId], references: [id])
+//   authorId    Int?
+//   response    Response   @relation(fields: [responseId], references: [id])
+//   responseId  Int
+// }
+
+// model User {
+//   id            Int       @default(autoincrement()) @id
+//   firstName     String
+//   lastName      String
+//   password      String?
+//   salt          String?
+//   email         String?   @unique
+//   createdAt     DateTime  @default(now()) @map(name: "created_at")
+//   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+//   questions     Question[]
+//   responses     Response[]
+//   ratings       Rating[]
+//   @@map(name: "users")
+// }
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int              @id @default(autoincrement())
+  firstName   String
+  lastName     String
+  password     String
+  salt         String
+  email        String           @unique
+  createdAt    DateTime  @default(now()) @map(name: "created_at")
+  updatedAt    DateTime  @updatedAt @map(name: "updated_at")
+  questions    Question[]
+  responses    Response[]
+  ratings      Rating[]
+}
+
+model Question {
+  id         Int        @id @default(autoincrement())
+  title      String
+  content    String
+  createdAt  DateTime  @default(now()) @map(name: "created_at")
+  author     User       @relation(fields: [authorId], references: [id])
+  authorId   Int
+  responses  Response[]
+  ratings    Rating[]
+}
+
+model Response {
+  id          Int     @default(autoincrement()) @id
+  content     String
+  createdAt   DateTime  @default(now()) @map(name: "created_at")
+  question    Question   @relation(fields: [questionId], references: [id])
+  questionId  Int
+  author      User  @relation(fields: [authorId], references: [id])
+  authorId    Int
+  ratings     Rating[]
+}
+
+model Rating {
+  id          Int     @default(autoincrement()) @id
+  rating      Boolean @default(false)
+  question    Question?   @relation(fields: [questionId], references: [id])
+  questionId  Int?
+  author      User   @relation(fields: [authorId], references: [id])
+  authorId    Int
+  response    Response?   @relation(fields: [responseId], references: [id])
+  responseId  Int?
+}

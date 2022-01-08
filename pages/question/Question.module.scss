@@ -1,0 +1,39 @@
+.pointer {
+    cursor: pointer;
+}
+
+.cardTitle {
+    font-size: 1.5rem;
+}
+
+.cardSubtitle {
+    font-size: 0.9rem;
+    color: gray;
+}
+
+.buttonContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.active {
+    background-color: #6c757d !important;
+    color: #fff !important;
+    &:hover {
+        background-color: #5c636a !important;
+    }
+}
+
+.ratingButton {
+    background-color: #fff ;
+    border: 1px solid #6c757d ;
+    color: #6c757d ;
+    &:hover {
+        background-color: #5c636a;
+    }
+    
+}
+
+// .tabContainer {
+//     background-color: gray;
+// }

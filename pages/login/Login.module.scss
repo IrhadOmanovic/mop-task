@@ -1,0 +1,10 @@
+.loginWrapper {
+  margin: auto;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+}
+
+.loginWrapper > * {
+  margin-bottom: 10px;
+}

@@ -1,0 +1,38 @@
+.myFormButton {
+  padding: 0 2rem 0 2rem;
+  text-align: center;
+  border-radius: 10px;
+  background-color: rgba($color: #313638, $alpha: 0.8);
+  color: #F7F6F1;
+  border: 1px solid rgba($color: #313638, $alpha: 0.8);
+  &:hover {
+    border: 1px solid #CC4F2C;
+    text-align: center;
+    background-color: #FF6337;
+    color: #F7F6F1; 
+  }
+  &:active :focus {
+    text-align: center;
+    background-color: #FF6337;
+    color: #F7F6F1; 
+    border:1px solid   #FF6337
+  }
+}
+
+.invalidFeedback {
+  width: 100%;
+  margin-top: .25rem;
+  font-size: 80%;
+  color: #d1011b;
+  font-size: .9rem;
+}
+
+.checkedIcon {
+  color: #FF6337;
+}
+
+.labelContainer {
+  width: auto; 
+  margin: 0;
+  display:block;
+}
