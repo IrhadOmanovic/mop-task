@@ -7,7 +7,9 @@ const RatingButtons = ({
   onClickLike,
   onClickDislike,
   likeActive,
-  dislikeActive
+  dislikeActive,
+  likesCount,
+  dislikesCount
 }) => {
   return (
     <div className='ms-auto'>
@@ -15,11 +17,13 @@ const RatingButtons = ({
         active={likeActive}
         icon={faThumbsUp}
         onClick={onClickLike}
+        text={likesCount}
       />
       <IconButton
         active={dislikeActive}
         icon={faThumbsDown}
         onClick={onClickDislike}
+        text={dislikesCount}
       />
     </div>
 
@@ -30,7 +34,9 @@ RatingButtons.propTypes = {
   onClickLike    : PropTypes.func,
   onClickDislike : PropTypes.func,
   likeActive     : PropTypes.bool,
-  dislikeActive  : PropTypes.bool
+  dislikeActive  : PropTypes.bool,
+  likesCount     : PropTypes.number,
+  dislikesCount  : PropTypes.number
 }
 
 export default RatingButtons

@@ -33,7 +33,7 @@ const QuestionList = ({
 
   const renderQuestionList = () => {
     return questions.map(question => {
-      const footerText = question?._count?.ratings ? `Number of positive ratings: ${question?._count?.ratings}` : ''
+      const footerText = question?.ratings?.length > 0 ? `Number of positive ratings: ${question?.ratings?.length}` : ''
       return (
         <WithLink key={question.id} location={`/question/${question.id}`}>
           <ListCard

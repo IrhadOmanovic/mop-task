@@ -1,6 +1,5 @@
 import classNames from 'classnames'
 import dayjs from 'dayjs'
-import PropTypes from 'prop-types'
 import React, { useContext, useEffect, useState } from 'react'
 import { Button, Card, CardBody, CardSubtitle, CardText, CardTitle, Container, Spinner } from 'reactstrap'
 import { getCsrfToken, useSession } from 'next-auth/react'
@@ -17,9 +16,13 @@ import {
   postResponse,
   setQuestion,
   updateContentResponse,
-  createOrUpdateQuestionRating,
   fetchQuestionForSignedUser,
-  createOrUpdateResponseRating
+  createResponseRating,
+  updateResponseRating,
+  deleteResponseRating,
+  createQuestionRating,
+  updateQuestionRating,
+  deleteQuestionRating
 } from '../../modules/question'
 
 export const getServerSideProps = reduxWrapper.getServerSideProps(store => async ({ query }) => {
@@ -27,9 +30,7 @@ export const getServerSideProps = reduxWrapper.getServerSideProps(store => async
 
   await store.dispatch(setQuestion(data))
   return {
-    props: {
-      question: data
-    }
+    props: {}
   }
 })
 
@@ -48,9 +49,12 @@ const defaultInputs = [
   }
 ]
 
-const QuestionDetail = ({ question }) => {
+const QuestionDetail = () => {
   const responses = useSelector(store => store.question?.responses)
   const ratings = useSelector(store => store.question?.ratings)
+  const question = useSelector(store => store.question)
+  const pending = useSelector(store => store.question.pending)
+  const pendingQuestionRating = useSelector(store => store.question.pendingQuestionRating)
 
   const socket = useContext(SocketContext)
   const { data: session, status } = useSession()
@@ -69,6 +73,12 @@ const QuestionDetail = ({ question }) => {
   const [formState, setFormState] = useState(defaultInputs)
   const [responsesEditForm, setResponsesEditForm] = useState(initialResponsesEditFormState)
   const [showQuestionForm, setShowQuestionForm] = useState(false)
+
+  const likes = ratings?.filter(rating => rating.rating === true).length || 0
+  const dislikes = ratings?.length ? ratings?.length - likes : 0
+
+  const currentUserRating = ratings?.find(rating => rating.authorId === session.user.id)
+  const currentUserRatingindex = ratings?.findIndex(rating => rating.authorId === session.user.id)
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -109,28 +119,38 @@ const QuestionDetail = ({ question }) => {
     })
   }
 
-  const onClickLike = async () => {
-    if (ratings?.[0]?.rating) {
-      return null
+  const onClickRatingResponse = async ({ rating }) => {
+    if (!currentUserRating) {
+      dispatch(createQuestionRating({
+        rating     : rating,
+        questionId : question.id,
+        csrfToken  : await getCsrfToken()
+      }))
+    } else if (currentUserRating.rating === !rating) {
+      dispatch(updateQuestionRating({
+        rating      : rating,
+        ratingId    : currentUserRating.id,
+        csrfToken   : await getCsrfToken(),
+        indexRating : currentUserRatingindex
+      }))
+    } else {
+      dispatch(deleteQuestionRating({
+        ratingId  : currentUserRating.id,
+        csrfToken : await getCsrfToken()
+      }))
     }
-    dispatch(createOrUpdateQuestionRating({
-      rating     : true,
-      ratingId   : ratings?.[0]?.id,
-      questionId : question.id,
-      csrfToken  : await getCsrfToken()
-    }))
+  }
+
+  const onClickLike = () => {
+    onClickRatingResponse({
+      rating: true
+    })
   }
 
   const onClickDislike = async () => {
-    if (ratings?.[0]?.rating === false) {
-      return null
-    }
-    dispatch(createOrUpdateQuestionRating({
-      rating     : false,
-      ratingId   : ratings?.[0]?.id,
-      questionId : question.id,
-      csrfToken  : await getCsrfToken()
-    }))
+    onClickRatingResponse({
+      rating: false
+    })
   }
 
   const renderLoadingSpinnersIndicators = () => {
@@ -160,12 +180,17 @@ const QuestionDetail = ({ question }) => {
                 Post an answer
               </Button>
             )}
+            {!pendingQuestionRating && (
             <RatingButtons
-              likeActive={ratings?.[0]?.rating}
+              likeActive={currentUserRating?.rating === true}
               onClickLike={onClickLike}
               onClickDislike={onClickDislike}
-              dislikeActive={ratings?.[0]?.rating === false}
+              dislikeActive={currentUserRating?.rating === false}
+              likesCount={likes}
+              dislikesCount={dislikes}
             />
+            )}
+            {pendingQuestionRating && <div className='ms-auto'><Spinner /></div>}
           </div>
         )}
         {renderLoadingSpinnersIndicators()}
@@ -206,10 +231,17 @@ const QuestionDetail = ({ question }) => {
       </div>
     )
   }
+
   const renderResponses = () => {
     return responses.map((response, index) => {
       const hasFirstAndLastname = response?.author?.firstName && response?.author?.lastName
       const fullNameOrEmail = hasFirstAndLastname ? response?.author?.firstName + ' ' + response?.author?.lastName : response?.author?.email
+
+      const likes = response.ratings?.filter(rating => rating.rating === true).length || 0
+      const dislikes = response.ratings?.length ? response.ratings?.length - likes : 0
+
+      const currentUserRating = response.ratings?.find(rating => rating.authorId === session.user.id)
+      const currentUserRatingindex = response.ratings?.findIndex(rating => rating.authorId === session.user.id)
 
       const setResponsesState = (newState) => {
         const tmpState = responsesEditForm
@@ -230,30 +262,42 @@ const QuestionDetail = ({ question }) => {
         }))
       }
 
-      const onClickLikeResponse = async () => {
-        if (responses[index].ratings?.[0]?.rating) {
-          return null
+      const onClickRatingResponse = async ({ rating }) => {
+        if (!currentUserRating) {
+          dispatch(createResponseRating({
+            rating        : rating,
+            responseId    : response.id,
+            csrfToken     : await getCsrfToken(),
+            indexResponse : index
+          }))
+        } else if (currentUserRating.rating === !rating) {
+          dispatch(updateResponseRating({
+            rating        : rating,
+            ratingId      : currentUserRating.id,
+            csrfToken     : await getCsrfToken(),
+            indexResponse : index,
+            indexRating   : currentUserRatingindex
+          }))
+        } else {
+          dispatch(deleteResponseRating({
+            ratingId      : currentUserRating.id,
+            csrfToken     : await getCsrfToken(),
+            indexResponse : index,
+            indexRating   : currentUserRatingindex
+          }))
         }
-        dispatch(createOrUpdateResponseRating({
-          rating     : true,
-          ratingId   : responses[index].ratings?.[0]?.id,
-          responseId : responses[index].id,
-          index      : index,
-          csrfToken  : await getCsrfToken()
-        }))
+      }
+
+      const onClickLikeResponse = () => {
+        onClickRatingResponse({
+          rating: true
+        })
       }
 
       const onClickDislikeResponse = async () => {
-        if (responses[index].ratings?.[0]?.rating === false) {
-          return null
-        }
-        dispatch(createOrUpdateResponseRating({
-          rating     : false,
-          ratingId   : responses[index].ratings?.[0]?.id,
-          responseId : responses[index].id,
-          index      : index,
-          csrfToken  : await getCsrfToken()
-        }))
+        onClickRatingResponse({
+          rating: false
+        })
       }
 
       return (
@@ -265,14 +309,17 @@ const QuestionDetail = ({ question }) => {
             {renderLoadingSpinnersIndicators()}
             <div className='d-flex'>
               {session?.user?.email === response?.author?.email && !responsesEditForm?.[index]?.show && renderEditDeleteButtons(response.id, index)}
-              {status === 'authenticated' && (
-                <RatingButtons
-                  likeActive={responses[index].ratings?.[0]?.rating}
-                  onClickLike={onClickLikeResponse}
-                  onClickDislike={onClickDislikeResponse}
-                  dislikeActive={responses[index].ratings?.[0]?.rating === false}
-                />
+              {status === 'authenticated' && !response.pending && (
+              <RatingButtons
+                likeActive={currentUserRating?.rating === true}
+                onClickLike={onClickLikeResponse}
+                onClickDislike={onClickDislikeResponse}
+                dislikeActive={currentUserRating?.rating === false}
+                likesCount={likes}
+                dislikesCount={dislikes}
+              />
               )}
+              {response.pending && <div className='ms-auto'><Spinner /></div>}
             </div>
             {responsesEditForm?.[index]?.show && (
               <MyForm
@@ -288,8 +335,17 @@ const QuestionDetail = ({ question }) => {
     })
   }
 
+  if (pending) {
+    return (
+      <Container className='py-5'>
+        <div className='text-center'><Spinner /></div>
+      </Container>
+    )
+  }
+
   return (
     <Container className='py-5'>
+
       {renderQuestionBody()}
       {showQuestionForm && (
         <MyForm
@@ -302,10 +358,6 @@ const QuestionDetail = ({ question }) => {
       {renderResponses()}
     </Container>
   )
-}
-
-QuestionDetail.propTypes = {
-  question: PropTypes.object
 }
 
 export default QuestionDetail

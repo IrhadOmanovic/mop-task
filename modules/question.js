@@ -5,17 +5,22 @@ const SET_QUESTION = 'question/SET_QUESTION'
 const POST_RESPONSE = 'question/POST_RESPONSE'
 const DELETE_RESPONSE = 'question/DELETE_RESPONSE'
 const UPDATE_CONTENT_RESPONSE = 'question/UPDATE_CONTENT_RESPONSE'
-const UPDATE_QUESTION_RATING = 'question/UPDATE_QUESTION_RATING'
+const CREATE_RESPONSE_RATING = 'question/CREATE_RESPONSE_RATING'
 const UPDATE_RESPONSE_RATING = 'question/UPDATE_RESPONSE_RATING'
-const FETCH_QUESTION_RATING = 'question/FETCH_QUESTION_RATING'
+const DELETE_RESPONSE_RATING = 'question/DELETE_RESPONSE_RATING'
+const UPDATE_QUESTION_RATING = 'question/UPDATE_QUESTION_RATING'
+const DELETE_QUESTION_RATING = 'question/DELETE_QUESTION_RATING'
+const CREATE_QUESTION_RATING = 'question/CREATE_QUESTION_RATING'
 const FETCH_QUESTION_FOR_SIGNED_USER = 'question/FETCH_QUESTION_FOR_SIGNED_USER'
 
 const initialState = {
-  content   : '',
-  createdAt : '',
-  title     : '',
-  responses : [],
-  ratings   : []
+  content               : '',
+  createdAt             : '',
+  title                 : '',
+  responses             : [],
+  ratings               : [],
+  pending               : false,
+  pendingQuestionRating : false
 }
 
 export const questionReducer = (state = initialState, action) => {
@@ -25,12 +30,6 @@ export const questionReducer = (state = initialState, action) => {
         ...state,
         ...action.data
       }
-    case FETCH_QUESTION_FOR_SIGNED_USER + '_FULFILLED':
-      return {
-        ...state,
-        ...action.payload.data
-      }
-
     case POST_RESPONSE + '_FULFILLED':
       return {
         ...state,
@@ -55,26 +54,121 @@ export const questionReducer = (state = initialState, action) => {
         test      : index
       }
     }
-    case FETCH_QUESTION_RATING + '_FULFILLED':
+    case FETCH_QUESTION_FOR_SIGNED_USER + '_PENDING':
       return {
         ...state,
-        ratings : [...action.payload.data],
-        test    : action.payload.data
+        pending: true
       }
-
-    case UPDATE_QUESTION_RATING + '_FULFILLED':
+    case FETCH_QUESTION_FOR_SIGNED_USER + '_FULFILLED':
       return {
         ...state,
-        ratings: [action.payload.data]
+        ...action.payload.data,
+        pending: false
       }
+    case CREATE_RESPONSE_RATING + '_PENDING':{
+      const tmp = state.responses
+      tmp[action.meta.indexResponse].pending = true
+      return {
+        ...state,
+        responses: [
+          ...tmp
+        ]
+      }
+    }
+    case CREATE_RESPONSE_RATING + '_FULFILLED':{
+      const tmp = state.responses
+      tmp[action.meta.indexResponse].pending = false
+      const ratings = [...tmp?.[action.meta.indexResponse]?.ratings, action.payload.data]
+      tmp[action.meta.indexResponse].ratings = ratings
+      return {
+        ...state,
+        responses: [
+          ...tmp
+        ]
+      }
+    }
+    case DELETE_RESPONSE_RATING + '_PENDING':{
+      const tmp = state.responses
+      tmp[action.meta.indexResponse].pending = true
+      return {
+        ...state,
+        responses: [
+          ...tmp
+        ]
+      }
+    }
+    case DELETE_RESPONSE_RATING + '_FULFILLED':{
+      const tmp = state.responses
+      tmp[action.meta.indexResponse].pending = false
+      tmp[action.meta.indexResponse].ratings = tmp[action.meta.indexResponse].ratings.filter(rating => rating.id !== action.payload.data.id)
+      return {
+        ...state,
+        responses: [
+          ...tmp
+        ]
+      }
+    }
+    case UPDATE_RESPONSE_RATING + '_PENDING':{
+      const tmp = state.responses
+      tmp[action.meta.indexResponse].pending = true
+      return {
+        ...state,
+        responses: [
+          ...tmp
+        ]
+      }
+    }
     case UPDATE_RESPONSE_RATING + '_FULFILLED':{
       const tmp = state.responses
-      if (action.meta.index) {
-        tmp[action.meta.index].ratings = [action.payload.data]
-      }
+      tmp[action.meta.indexResponse].pending = false
+      tmp[action.meta.indexResponse].ratings[action.meta.indexRating] = action.payload.data
       return {
         ...state,
-        responses: [...tmp]
+        responses: [
+          ...tmp
+        ]
+      }
+    }
+    case CREATE_QUESTION_RATING + '_PENDING':{
+      return {
+        ...state,
+        pendingQuestionRating: true
+      }
+    }
+    case CREATE_QUESTION_RATING + '_FULFILLED':{
+      return {
+        ...state,
+        ratings               : [...state.ratings, action.payload.data],
+        pendingQuestionRating : false
+      }
+    }
+    case DELETE_QUESTION_RATING + '_PENDING':{
+      return {
+        ...state,
+        pendingQuestionRating: true
+      }
+    }
+    case DELETE_QUESTION_RATING + '_FULFILLED':{
+      const tmp = state.ratings.filter(rating => rating.id !== action.payload.data.id)
+      return {
+        ...state,
+        ratings               : [...tmp],
+        pendingQuestionRating : false
+      }
+    }
+    case UPDATE_QUESTION_RATING + '_PENDING':{
+      return {
+        ...state,
+        pendingQuestionRating: true
+      }
+    }
+    case UPDATE_QUESTION_RATING + '_FULFILLED':{
+      const tmp = state.ratings
+      tmp[action.meta.indexRating] = action.payload.data
+      return {
+        ...state,
+        ratings               : [...tmp],
+        pendingQuestionRating : false
       }
     }
     default:
@@ -143,41 +237,113 @@ export const updateContentResponse = ({
   })
 }
 
-export const createOrUpdateQuestionRating = ({
+export const createResponseRating = ({
+  rating,
+  responseId,
+  csrfToken,
+  indexResponse
+}) => dispatch => {
+  return dispatch({
+    type    : CREATE_RESPONSE_RATING,
+    payload : axios.post('../api/rating', {
+      rating     : rating,
+      responseId : responseId,
+      csrfToken  : csrfToken
+    }),
+    meta: {
+      indexResponse
+    }
+  })
+}
+
+export const updateResponseRating = ({
   rating,
   ratingId,
+  csrfToken,
+  indexRating,
+  indexResponse
+}) => dispatch => {
+  return dispatch({
+    type    : UPDATE_RESPONSE_RATING,
+    payload : axios.patch('../api/rating', {
+      rating    : rating,
+      ratingId  : ratingId,
+      csrfToken : csrfToken
+    }),
+    meta: {
+      indexRating,
+      indexResponse
+    }
+  })
+}
+
+export const deleteResponseRating = ({
+  ratingId,
+  csrfToken,
+  indexRating,
+  indexResponse
+}) => dispatch => {
+  return dispatch({
+    type    : DELETE_RESPONSE_RATING,
+    payload : axios.delete('../api/rating', {
+      data: {
+        ratingId  : ratingId,
+        csrfToken : csrfToken
+      }
+    }),
+    meta: {
+      indexRating,
+      indexResponse
+    }
+  })
+}
+
+export const createQuestionRating = ({
+  rating,
   questionId,
   csrfToken
 }) => dispatch => {
   return dispatch({
-    type    : UPDATE_QUESTION_RATING,
-    payload : axios.put('../api/rating', {
+    type    : CREATE_QUESTION_RATING,
+    payload : axios.post('../api/rating', {
       rating     : rating,
-      ratingId   : ratingId,
       questionId : questionId,
       csrfToken  : csrfToken
     })
   })
 }
 
-export const createOrUpdateResponseRating = ({
+export const updateQuestionRating = ({
   rating,
   ratingId,
-  responseId,
-  index,
+  csrfToken,
+  indexRating
+}) => dispatch => {
+  return dispatch({
+    type    : UPDATE_QUESTION_RATING,
+    payload : axios.patch('../api/rating', {
+      rating    : rating,
+      ratingId  : ratingId,
+      csrfToken : csrfToken
+    }),
+    meta: {
+      indexRating
+    }
+  })
+}
+
+export const deleteQuestionRating = ({
+  ratingId,
   csrfToken
 }) => dispatch => {
   return dispatch({
-    type    : UPDATE_RESPONSE_RATING,
-    payload : axios.put('../api/rating/responses', {
-      rating     : rating,
-      ratingId   : ratingId,
-      responseId : responseId,
-      csrfToken  : csrfToken
-    }),
-    meta: {
-      index
-    }
+    type    : DELETE_QUESTION_RATING,
+    payload : axios.delete('../api/rating', {
+      data: {
+        ratingId  : ratingId,
+        csrfToken : csrfToken
+      }
+    })
   })
 }
 

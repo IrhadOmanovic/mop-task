@@ -53,26 +53,57 @@ module.exports = {
       prisma.$disconnect()
     }
   },
-  createResponseRating: async ({
+  createRating: async ({
     responseId,
     email,
-    rating
+    rating,
+    questionId
   }) => {
     const prisma = DBClient.getInstance().prisma
     try {
-      const result = await prisma.rating.create({
-        data: {
-          rating : rating,
-          author : {
-            connect: { email: email }
-          },
-          response: {
-            connect: { id: responseId }
-          }
+      const data = {
+        rating : rating,
+        author : {
+          connect: { email: email }
         }
+      }
+
+      if (questionId) {
+        data.question = {
+          connect: { id: questionId }
+        }
+      }
+
+      if (responseId) {
+        data.response = {
+          connect: { id: responseId }
+        }
+      }
+
+      const result = await prisma.rating.create({
+        data: data
       })
 
       // result.createdAt = result.createdAt.toString()
+
+      return result
+    } catch (error) {
+      console.log(error)
+      return { error: 'Unable to connect to the database!' }
+    } finally {
+      prisma.$disconnect()
+    }
+  },
+  deleteRating: async ({
+    ratingId
+  }) => {
+    const prisma = DBClient.getInstance().prisma
+    try {
+      const result = await prisma.rating.delete({
+        where: {
+          id: ratingId
+        }
+      })
 
       return result
     } catch (error) {

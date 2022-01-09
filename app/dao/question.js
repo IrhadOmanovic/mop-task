@@ -37,8 +37,10 @@ module.exports = {
           }
         },
         include: {
-          _count: {
-            select: { ratings: true }
+          ratings: {
+            where: {
+              rating: true
+            }
           }
         },
         where: {
@@ -121,8 +123,7 @@ module.exports = {
     }
   },
   fetchQuestionForSignedUser: async ({
-    questionId,
-    email
+    questionId
   }) => {
     const prisma = DBClient.getInstance().prisma
     try {
@@ -133,25 +134,12 @@ module.exports = {
         include: {
           responses: {
             include: {
-              ratings: {
-                where: {
-                  author: {
-                    email: email
-                  }
-                }
-              },
-              author: true
+              ratings : true,
+              author  : true
             }
           },
-          ratings: {
-            where: {
-              author: {
-                email: email
-              }
-            }
-          }
+          ratings: true
         }
-
       })
 
       result.createdAt = result.createdAt.toString()

@@ -8,7 +8,8 @@ import styles from './IconButton.module.scss'
 const IconButton = ({
   active,
   icon,
-  onClick
+  onClick,
+  text
 }) => {
   return (
     <Button
@@ -17,9 +18,10 @@ const IconButton = ({
       })}
       onClick={() => onClick()}
     >
-      <span>
-        <FontAwesomeIcon icon={icon} />
-      </span>
+      <div>
+        <FontAwesomeIcon className='me-2' icon={icon} />
+        {text}
+      </div>
     </Button>
 
   )
@@ -28,7 +30,8 @@ const IconButton = ({
 IconButton.propTypes = {
   active  : PropTypes.bool,
   icon    : PropTypes.any,
-  onClick : PropTypes.func
+  onClick : PropTypes.func,
+  text    : PropTypes.oneOf(['number', 'string'])
 }
 
 export default IconButton

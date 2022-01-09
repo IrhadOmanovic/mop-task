@@ -15,5 +15,12 @@
     &:hover {
         background-color: $gray-500;
     }
+    &:focus, &:active {
+        outline: none;
+        box-shadow: none;
+        background-color: $white-100 ;
+        border: 1px solid $gray-600 ;
+        color: $gray-600 ;
+    }
     
 }
