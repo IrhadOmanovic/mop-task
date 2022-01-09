@@ -9,7 +9,8 @@ const UPDATE_USER_PASSWORD = 'user/UPDATE_USER_PASSWORD'
 
 const initialState = {
   message : '',
-  error   : false
+  error   : false,
+  pending : false
 }
 
 export const userReducer = (state = initialState, action) => {
@@ -25,9 +26,15 @@ export const userReducer = (state = initialState, action) => {
         message : action.payload.data?.message,
         error   : action.payload.data?.error
       }
+    case FETCH_LOGGED_USER + '_PENDING':
+      return {
+        ...state,
+        pending: true
+      }
     case FETCH_LOGGED_USER + '_FULFILLED':
       return {
         ...state,
+        pending: false,
         ...action.payload.data
       }
     case UPDATE_LOGGED_USER + '_FULFILLED':

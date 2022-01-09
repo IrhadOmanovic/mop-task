@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
-
+import { useDispatch } from 'react-redux'
 import { Container } from 'reactstrap'
 import { getCsrfToken, useSession } from 'next-auth/react'
+
 import MyForm from '../../patterns/molecules/form'
-import axios from 'axios'
+import { addMyQuestion } from '../../../modules/lists'
 
 const defaultInputs = [
   {
@@ -35,6 +36,7 @@ const defaultInputs = [
 
 const QuestionForm = () => {
   const { status } = useSession()
+  const dispatch = useDispatch()
   const [formState, setFormState] = useState(defaultInputs)
 
   const getFieldByName = (name) => {
@@ -47,11 +49,11 @@ const QuestionForm = () => {
   }
 
   const submitFunction = async () => {
-    await axios.post('../api/question', {
+    dispatch(addMyQuestion({
       title     : getFieldByName('question-title').value,
       content   : getFieldByName('question-content').value,
       csrfToken : await getToken()
-    })
+    }))
   }
 
   return (

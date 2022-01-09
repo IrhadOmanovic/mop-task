@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import dayjs from 'dayjs'
 import PropTypes from 'prop-types'
 import React, { useContext, useEffect, useState } from 'react'
-import { Button, Card, CardBody, CardSubtitle, CardText, CardTitle, Container } from 'reactstrap'
+import { Button, Card, CardBody, CardSubtitle, CardText, CardTitle, Container, Spinner } from 'reactstrap'
 import { getCsrfToken, useSession } from 'next-auth/react'
 import { useDispatch, useSelector } from 'react-redux'
 import { reduxWrapper } from '@pimred/redux'
@@ -133,6 +133,18 @@ const QuestionDetail = ({ question }) => {
     }))
   }
 
+  const renderLoadingSpinnersIndicators = () => {
+    if (status === 'loading') {
+      return (
+        <div className='my-2 clearfix'>
+          <div className='float-start'><Spinner /></div>
+          <div className='float-end'><Spinner /></div>
+        </div>
+      )
+    }
+    return null
+  }
+
   const renderQuestionBody = () => {
     return (
       <>
@@ -156,6 +168,7 @@ const QuestionDetail = ({ question }) => {
             />
           </div>
         )}
+        {renderLoadingSpinnersIndicators()}
       </>
     )
   }
@@ -171,6 +184,7 @@ const QuestionDetail = ({ question }) => {
     if (status !== 'authenticated') {
       return null
     }
+
     return (
       <div>
         <Button
@@ -248,6 +262,7 @@ const QuestionDetail = ({ question }) => {
             <CardTitle className={styles.cardTitle}>{`Responded by: ${fullNameOrEmail}`}</CardTitle>
             <CardSubtitle className={styles.cardSubtitle}>{`Responded at: ${response.createdAt}`}</CardSubtitle>
             <CardText>{response.content}</CardText>
+            {renderLoadingSpinnersIndicators()}
             <div className='d-flex'>
               {session?.user?.email === response?.author?.email && !responsesEditForm?.[index]?.show && renderEditDeleteButtons(response.id, index)}
               {status === 'authenticated' && (

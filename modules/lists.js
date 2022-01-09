@@ -4,6 +4,7 @@ import { reducerRegistry } from '@pimred/redux'
 const FETCH_LISTS = 'lists/FETCH_LISTS'
 const FETCH_MY_QUESTIONS_LISTS = 'lists/FETCH_MY_QUESTIONS_LISTS'
 const SET_LIST = 'lists/SET_LIST'
+const ADD_SIGNED_USER_QUESTION = 'lists/ADD_SIGNED_USER_QUESTION'
 
 const initialState = {
   latestQuestions     : [],
@@ -14,7 +15,9 @@ const initialState = {
   latestQuestionsPage        : 0,
   latestQuestionsPerPage     : 20,
   signedUserQuestionsPage    : 0,
-  signedUserQuestionsPerPage : 2
+  signedUserQuestionsPerPage : 20,
+
+  signedUserQuestionsPending: false
 }
 
 export const listsReducer = (state = initialState, action) => {
@@ -26,13 +29,25 @@ export const listsReducer = (state = initialState, action) => {
         latestQuestionsPage    : action.meta.page,
         latestQuestionsPerPage : action.meta.perPage
       }
+    case FETCH_MY_QUESTIONS_LISTS + '_PENDING':
+      return {
+        ...state,
+        signedUserQuestionsPending: true
+      }
     case FETCH_MY_QUESTIONS_LISTS + '_FULFILLED':
       return {
         ...state,
         signedUserQuestions        : [...state.signedUserQuestions, ...action.payload.data],
         signedUserQuestionsPage    : action.meta.page,
-        signedUserQuestionsPerPage : action.meta.perPage
+        signedUserQuestionsPerPage : action.meta.perPage,
+        signedUserQuestionsPending : false
       }
+    case ADD_SIGNED_USER_QUESTION + '_FULFILLED':{
+      return {
+        ...state,
+        signedUserQuestions: [...state.signedUserQuestions, action.payload.data]
+      }
+    }
     case SET_LIST:
       return {
         ...state,
@@ -46,6 +61,21 @@ export const listsReducer = (state = initialState, action) => {
 }
 
 reducerRegistry.register('lists', listsReducer)
+
+export const addMyQuestion = ({
+  title,
+  content,
+  csrfToken
+}) => dispatch => {
+  return dispatch({
+    type    : ADD_SIGNED_USER_QUESTION,
+    payload : axios.post('../api/question', {
+      title     : title,
+      content   : content,
+      csrfToken : csrfToken
+    })
+  })
+}
 
 export const fetchLists = ({
   page,

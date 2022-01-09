@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { reduxWrapper } from '@pimred/redux'
 import { Container } from 'reactstrap'
 
-import QuestionForm from '../components/containers/question/form'
 import QuestionList from '../components/containers/question/list'
 import styles from '../styles/Home.module.scss'
 import { getHotestQuestions, getLatestQuestions } from '../app/dao/question'
@@ -66,7 +65,7 @@ const Home = () => {
 
   const renderTabs = () => {
     return (
-      <div className={classNames('d-dlex', styles.tabContainer)}>
+      <div className={classNames(styles.tabContainer)}>
         {tabs.map((tab, index) => {
           return (
             <div
@@ -94,9 +93,7 @@ const Home = () => {
         <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js' integrity='sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM' crossOrigin='anonymous' />
       </Head>
 
-      <Container>
-        <div className='m-5'>Wellcome!</div>
-        <QuestionForm />
+      <Container className='py-5'>
         {renderTabs()}
         {tabs[activeTabIndex].content}
       </Container>

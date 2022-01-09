@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getCsrfToken, useSession } from 'next-auth/react'
-import { Button, Card, CardBody, CardGroup, CardHeader, CardText, Container } from 'reactstrap'
+import { Button, Card, CardBody, CardGroup, CardHeader, CardText, Container, Spinner } from 'reactstrap'
 
 import styles from './User.module.scss'
 import { fetchLoggedUserDetails, updateUser, updateUserPassword } from '../../modules/user'
@@ -70,6 +70,7 @@ const MyProfile = () => {
   const { status } = useSession()
 
   const user = useSelector(state => state.user)
+  const pending = useSelector(state => state?.user?.pending)
   const errorMessage = useSelector(state => state.user.message)
   const [activeForm, setActiveForm] = useState(0)
   const [generalInfoForm, setGeneralInfoForm] = useState(generalInfoFormFields)
@@ -178,6 +179,7 @@ const MyProfile = () => {
 
   return (
     <Container>
+      {(pending || status === 'loading') && <div className='my-5 text-center'><Spinner /></div>}
       {user.email && renderProfileDetails()}
       {status === 'authenticated' && user.email && forms[activeForm]}
     </Container>

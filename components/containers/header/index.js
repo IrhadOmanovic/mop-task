@@ -12,7 +12,7 @@ import SocketContext from '../../contexts/socketContext'
 const Header = () => {
   const router = useRouter()
   const { data: session, status } = useSession()
-  const userEmail = useSelector(state => state.user?.email)
+  const userEmail = useSelector(state => state?.user?.email)
   const socket = useContext(SocketContext)
   const [isOpen, setIsOpen] = useState(false)
   const [notifications, setNotifications] = useState([])
