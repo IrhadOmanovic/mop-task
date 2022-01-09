@@ -40,5 +40,8 @@
     "prisma": "^3.7.0",
     "reactstrap": "^9.0.1",
     "sass": "^1.45.2"
+  },
+  "engines": {
+    "node": "16.x"
   }
 }
