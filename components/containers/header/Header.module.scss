@@ -1,3 +1,5 @@
+@import '../../../styles/Variables.scss';
+
 .footer {
   display: flex;
   flex: 1;
@@ -14,20 +16,42 @@
   flex-grow: 1;
 }
 
-  
-.logo {
-  height: 1em;
-  margin-left: 0.5rem;
-}
-
 .navigation {
   display: flex;
 }
 
 .navigationItem {
-  padding: 5px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .f1 {
   flex: 1;
+}
+
+.notifications {
+  border: none !important;
+  background-color: $main-color;
+  padding: 0;
+  font-family: var(--bs-font-sans-serif);
+  font-size: 1rem;
+  color: $text-color;
+  vertical-align: baseline;
+  box-shadow:0 0 0 0.25rem $main-color !important;
+  margin-right: 10px;
+  &:hover, &:focus, &:visited, &:active {
+    background-color: $main-color;
+    border: none;
+  }
+}
+
+.navbarItem {
+  cursor: pointer;
+  &:hover {
+    color: $white-100;
+  }
+}
+
+.container {
+  background-color: $main-color;
 }

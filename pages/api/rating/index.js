@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
-import { getSession } from 'next-auth/react'
-import { createQuestionRating, fetchQuestionRating, updateRating } from '../../../app/dao/rating'
+import { getCsrfToken, getSession } from 'next-auth/react'
+import { createQuestionRating, updateRating } from '../../../app/dao/rating'
 
 export default async function handler (req, res) {
   const session = await getSession({ req })
@@ -10,22 +10,12 @@ export default async function handler (req, res) {
     return
   }
 
-  if (req.method === 'GET') {
-    try {
-      const questionId = parseInt(req.query.questionId)
-      const rating = await fetchQuestionRating({
-        questionId : questionId,
-        email      : session.user.email
-      })
-
-      const result = rating ? [rating] : []
-
-      res.status(200).json(result)
-    } catch (error) {
-      console.log(error)
-      res.status(500).json({ error: 'Unable to connect to the database!' })
+  if (req.method === 'PUT') {
+    const csrfToken = await getCsrfToken({ req })
+    if (csrfToken !== req.body.csrfToken) {
+      res.status(200).json({ message: 'Csrf token does not match!', error: true })
+      return
     }
-  } if (req.method === 'PUT') {
     try {
       let result
       if (!req.body.ratingId) {

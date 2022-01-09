@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
-import { getSession } from 'next-auth/react'
+import { getCsrfToken, getSession } from 'next-auth/react'
 import { updateUserPassword } from '../../../../app/dao/user'
 
 export default async function handler (req, res) {
@@ -9,9 +9,15 @@ export default async function handler (req, res) {
     res.status(200).json({ message: 'User is not logged in!', error: true })
     return
   }
+
+  const csrfToken = await getCsrfToken({ req })
+  if (csrfToken !== req.body.csrfToken) {
+    res.status(200).json({ message: 'Csrf token does not match!', error: true })
+    return
+  }
+
   if (req.method === 'PATCH') {
     try {
-      console.log(req.body)
       const result = await updateUserPassword({
         email    : session.user.email,
         password : req.body.password

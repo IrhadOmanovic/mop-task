@@ -1,10 +1,7 @@
-// import PropTypes from 'prop-types'
-// import { useDispatch } from 'react-redux'
-// import { useRouter } from 'next/router'
 import classNames from 'classnames'
 import dayjs from 'dayjs'
 import PropTypes from 'prop-types'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Button, Card, CardBody, CardSubtitle, CardText, CardTitle, Container } from 'reactstrap'
 import { getCsrfToken, useSession } from 'next-auth/react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -13,8 +10,17 @@ import { reduxWrapper } from '@pimred/redux'
 import MyForm from '../../components/patterns/molecules/form'
 import styles from './Question.module.scss'
 import RatingButtons from '../../components/patterns/molecules/ratingButtons'
+import SocketContext from '../../components/contexts/socketContext'
 import { getQuestion } from '../../app/dao/question'
-import { deleteResponse, fetchQuestionRating, postResponse, setQuestion, updateContentResponse, createOrUpdateQuestionRating, fetchQuestionForSignedUser, createOrUpdateResponseRating } from '../../modules/question'
+import {
+  deleteResponse,
+  postResponse,
+  setQuestion,
+  updateContentResponse,
+  createOrUpdateQuestionRating,
+  fetchQuestionForSignedUser,
+  createOrUpdateResponseRating
+} from '../../modules/question'
 
 export const getServerSideProps = reduxWrapper.getServerSideProps(store => async ({ query }) => {
   const data = await getQuestion(parseInt(query.id))
@@ -46,6 +52,10 @@ const QuestionDetail = ({ question }) => {
   const responses = useSelector(store => store.question?.responses)
   const ratings = useSelector(store => store.question?.ratings)
 
+  const socket = useContext(SocketContext)
+  const { data: session, status } = useSession()
+  const dispatch = useDispatch()
+
   const initialResponsesEditFormState = responses.map(response => {
     const tmp = JSON.parse(JSON.stringify(defaultInputs))
     tmp[0].name = response.id
@@ -60,12 +70,8 @@ const QuestionDetail = ({ question }) => {
   const [responsesEditForm, setResponsesEditForm] = useState(initialResponsesEditFormState)
   const [showQuestionForm, setShowQuestionForm] = useState(false)
 
-  const { data: session, status } = useSession()
-  const dispatch = useDispatch()
-
   useEffect(() => {
     if (status === 'authenticated') {
-      // dispatch(fetchQuestionRating({ questionId: question.id }))
       dispatch(fetchQuestionForSignedUser({ questionId: question.id }))
     }
   }, [status])
@@ -92,28 +98,38 @@ const QuestionDetail = ({ question }) => {
       content    : getFieldByName('answer-content').value,
       questionId : question.id,
       csrfToken  : await getCsrfToken()
-    }))
+    })).then(res => {
+      if (res?.action?.payload?.data?.id) {
+        socket.emit('sendNotification', {
+          senderId   : session.user.id,
+          recieverId : question.authorId,
+          type       : 'response'
+        })
+      }
+    })
   }
 
-  const onClickLike = () => {
+  const onClickLike = async () => {
     if (ratings?.[0]?.rating) {
       return null
     }
     dispatch(createOrUpdateQuestionRating({
       rating     : true,
       ratingId   : ratings?.[0]?.id,
-      questionId : question.id
+      questionId : question.id,
+      csrfToken  : await getCsrfToken()
     }))
   }
 
-  const onClickDislike = () => {
+  const onClickDislike = async () => {
     if (ratings?.[0]?.rating === false) {
       return null
     }
     dispatch(createOrUpdateQuestionRating({
       rating     : false,
       ratingId   : ratings?.[0]?.id,
-      questionId : question.id
+      questionId : question.id,
+      csrfToken  : await getCsrfToken()
     }))
   }
 
@@ -200,7 +216,7 @@ const QuestionDetail = ({ question }) => {
         }))
       }
 
-      const onClickLikeResponse = () => {
+      const onClickLikeResponse = async () => {
         if (responses[index].ratings?.[0]?.rating) {
           return null
         }
@@ -208,11 +224,12 @@ const QuestionDetail = ({ question }) => {
           rating     : true,
           ratingId   : responses[index].ratings?.[0]?.id,
           responseId : responses[index].id,
-          index      : index
+          index      : index,
+          csrfToken  : await getCsrfToken()
         }))
       }
 
-      const onClickDislikeResponse = () => {
+      const onClickDislikeResponse = async () => {
         if (responses[index].ratings?.[0]?.rating === false) {
           return null
         }
@@ -220,7 +237,8 @@ const QuestionDetail = ({ question }) => {
           rating     : false,
           ratingId   : responses[index].ratings?.[0]?.id,
           responseId : responses[index].id,
-          index      : index
+          index      : index,
+          csrfToken  : await getCsrfToken()
         }))
       }
 
@@ -232,12 +250,14 @@ const QuestionDetail = ({ question }) => {
             <CardText>{response.content}</CardText>
             <div className='d-flex'>
               {session?.user?.email === response?.author?.email && !responsesEditForm?.[index]?.show && renderEditDeleteButtons(response.id, index)}
-              <RatingButtons
-                likeActive={responses[index].ratings?.[0]?.rating}
-                onClickLike={onClickLikeResponse}
-                onClickDislike={onClickDislikeResponse}
-                dislikeActive={responses[index].ratings?.[0]?.rating === false}
-              />
+              {status === 'authenticated' && (
+                <RatingButtons
+                  likeActive={responses[index].ratings?.[0]?.rating}
+                  onClickLike={onClickLikeResponse}
+                  onClickDislike={onClickDislikeResponse}
+                  dislikeActive={responses[index].ratings?.[0]?.rating === false}
+                />
+              )}
             </div>
             {responsesEditForm?.[index]?.show && (
               <MyForm

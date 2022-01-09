@@ -1,20 +1,27 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
-import DBClient from '../../../app/DBClient'
+
+import { fetchUser, fetchUserById } from '../../../app/dao/user'
 import { compareHashedPasswords } from '../../../lib/hash'
 // import axios from 'axios'
 
 const providers = [
   Credentials({
-    name      : 'Credentials',
-    authorize : async (credentials, req) => {
-      const prisma = DBClient.getInstance().prisma
-
-      const user = await prisma.user.findFirst({
-        where: {
-          email: req.body.email
-        }
-      })
+    name        : 'Credentials',
+    credentials : {
+      username : { label: 'Username', type: 'text' },
+      password : { label: 'Password', type: 'password' }
+    },
+    authorize: async (credentials, req) => {
+      let user
+      try {
+        user = await fetchUser({
+          email          : req.body.email,
+          returnPassword : true
+        })
+      } catch (error) {
+        console.log(error)
+      }
 
       if (user) {
         const match = compareHashedPasswords(req.body.password, {
@@ -31,7 +38,6 @@ const providers = [
 
       delete user.password
       delete user.salt
-      prisma.$disconnect()
 
       return user
     }
@@ -41,25 +47,16 @@ const providers = [
 const callbacks = {
   // Getting the JWT token from API response
   async jwt ({ token, user, ...props }) {
-    // console.log('token', token)
-    // console.log('user', user)
-    // console.log('props', props)
     user && (token.user = user)
     return token
   },
 
   async session ({ session, token }) {
-    if (token?.user?.id) {
-      const prisma = DBClient.getInstance().prisma
-      const user = await prisma.user.findFirst({
-        where: {
-          id: token.user.id
-        }
+    if (token?.user?.email) {
+      const user = await fetchUserById({
+        id: token.user.id
       })
-      delete user.password
-      delete user.salt
       session.user = user
-      prisma.$disconnect()
       return session
     }
     session.user = token.user

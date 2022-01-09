@@ -39,17 +39,18 @@ module.exports = {
     firstName,
     lastName,
     password,
-    salt,
     email
   }) => {
     const prisma = DBClient.getInstance().prisma
+    const salt = generateSalt(10)
+    const hashResult = hash(password, salt)
     try {
       const user = await prisma.user.create({
         data: {
           firstName : firstName,
           lastName  : lastName,
-          password  : password,
-          salt      : salt,
+          password  : hashResult.hashedpassword,
+          salt      : hashResult.salt,
           email     : email
         }
       })
@@ -85,7 +86,8 @@ module.exports = {
     }
   },
   fetchUser: async ({
-    email
+    email,
+    returnPassword
   }) => {
     const prisma = DBClient.getInstance().prisma
     try {
@@ -94,10 +96,17 @@ module.exports = {
           email: email
         }
       })
-      delete result.password
-      delete result.salt
+
+      if (!result) return null
 
       result.createdAt = result.createdAt.toString()
+
+      if (returnPassword) {
+        return result
+      }
+
+      delete result.password
+      delete result.salt
 
       return result
     } catch (error) {
@@ -115,16 +124,28 @@ module.exports = {
   }) => {
     const prisma = DBClient.getInstance().prisma
     try {
+      const data = {}
+
+      if (email) {
+        data.email = email
+      }
+      if (firstName) {
+        data.firstName = firstName
+      }
+
+      if (lastName) {
+        data.lastName = lastName
+      }
+
       const user = await prisma.user.update({
         where: {
           email: currentEmail
         },
-        data: {
-          firstName : firstName,
-          lastName  : lastName,
-          email     : email
-        }
+        data: data
       })
+
+      delete user.password
+      delete user.salt
 
       user.createdAt = user.createdAt.toString()
       user.updatedAt = user.updatedAt.toString()
@@ -159,7 +180,34 @@ module.exports = {
       user.createdAt = user.createdAt.toString()
       user.updatedAt = user.updatedAt.toString()
 
+      delete user.password
+      delete user.hash
+
       return user
+    } catch (error) {
+      console.log(error)
+      return { error: 'Unable to connect to the database!' }
+    } finally {
+      prisma.$disconnect()
+    }
+  },
+  fetchUserById: async ({
+    id
+  }) => {
+    const prisma = DBClient.getInstance().prisma
+    try {
+      const result = await prisma.user.findFirst({
+        where: {
+          id: id
+        }
+      })
+
+      result.createdAt = result.createdAt.toString()
+
+      delete result.password
+      delete result.salt
+
+      return result
     } catch (error) {
       console.log(error)
       return { error: 'Unable to connect to the database!' }

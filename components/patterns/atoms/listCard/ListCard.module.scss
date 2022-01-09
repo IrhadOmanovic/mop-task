@@ -1,6 +1,8 @@
+@import '../../../../styles/Variables.scss';
+
 .cardSubtitle {
     font-size: 0.9rem;
-    color: gray;
+    color: $main-color;
 }
 
 .cardTitle {

@@ -13,7 +13,6 @@ import { fetchLists, setLists } from '../modules/lists'
 import classNames from 'classnames'
 import { getMostActiveUsers } from '../app/dao/user'
 import UserList from '../components/containers/user/list'
-import { useSession } from 'next-auth/react'
 
 export const getServerSideProps = reduxWrapper.getServerSideProps(store => async ({ query }) => {
   const latestQuestions = await getLatestQuestions()
@@ -36,9 +35,6 @@ export const getServerSideProps = reduxWrapper.getServerSideProps(store => async
 const Home = () => {
   const lists = useSelector(state => state.lists)
   const [activeTabIndex, setActiveTabIndex] = useState(0)
-
-  const { data: session } = useSession()
-  console.log(session)
 
   const page = useSelector(state => state?.lists?.latestQuestionsPage)
   const perPage = useSelector(state => state?.lists?.latestQuestionsPerPage)

@@ -16,11 +16,12 @@ export const userReducer = (state = initialState, action) => {
   switch (action.type) {
     case LOGIN_USER + '_FULFILLED':
       return {
-        message : action.payload.data?.message,
-        error   : action.payload.data?.error
+        ...state,
+        error: action.payload.data?.error
       }
     case REGISTER_USER + '_FULFILLED':
       return {
+        ...state,
         message : action.payload.data?.message,
         error   : action.payload.data?.error
       }
@@ -32,6 +33,8 @@ export const userReducer = (state = initialState, action) => {
     case UPDATE_LOGGED_USER + '_FULFILLED':
       return {
         ...state,
+        message : '',
+        error   : false,
         ...action.payload.data
       }
     case UPDATE_USER_PASSWORD + '_FULFILLED':
@@ -82,12 +85,14 @@ export const updateUser = ({
 }
 
 export const updateUserPassword = ({
-  password
+  password,
+  csrfToken
 }) => dispatch => {
   return dispatch({
     type    : UPDATE_USER_PASSWORD,
     payload : axios.patch('../api/user/password', {
-      password: password
+      password  : password,
+      csrfToken : csrfToken
     })
   })
 }

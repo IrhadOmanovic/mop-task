@@ -1,7 +1,7 @@
+import classNames from 'classnames'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, CardBody, CardFooter, CardHeader, CardText, CardTitle } from 'reactstrap'
-import classNames from 'classnames'
 
 import styles from './ListCard.module.scss'
 

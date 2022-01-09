@@ -1,6 +1,3 @@
-// import PropTypes from 'prop-types'
-// import { useDispatch } from 'react-redux'
-// import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { Container } from 'reactstrap'
 import { signIn } from 'next-auth/react'
@@ -30,16 +27,22 @@ const Login = () => {
 
     }
   ]
-
+  const [formErrorMessage, setFormErrorMessage] = useState('')
   const [formState, setFormState] = useState(defaultInputs)
   const submitFunction = () => {
+    const passwordFieldValue = getFieldByName('login-password').value
+    if (passwordFieldValue.length < 5) {
+      setFormErrorMessage('Password must be at least of 5 characters size!')
+      return
+    }
     signIn('credentials',
       {
         email       : getFieldByName('login-email').value,
-        password    : getFieldByName('login-password').value,
+        password    : passwordFieldValue,
         callbackUrl : '/'
       }
     )
+    setFormErrorMessage('')
   }
 
   const getFieldByName = (name) => {
@@ -54,6 +57,7 @@ const Login = () => {
         submitFunction={submitFunction}
         heading='Login'
       />
+      {formErrorMessage !== '' && <div className='text-center text-danger mb-3'>{formErrorMessage}</div>}
     </Container>
   )
 }

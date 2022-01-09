@@ -1,28 +1,6 @@
 const { default: DBClient } = require('../DBClient')
 
 module.exports = {
-  fetchQuestionRating: async ({
-    questionId,
-    email
-  }) => {
-    const prisma = DBClient.getInstance().prisma
-    try {
-      const ratingResult = await prisma.rating.findFirst({
-        where: {
-          questionId : questionId,
-          author     : {
-            email: email
-          }
-        }
-      })
-      return ratingResult
-    } catch (error) {
-      console.log(error)
-      return { error: 'Unable to connect to the database!' }
-    } finally {
-      prisma.$disconnect()
-    }
-  },
   updateRating: async ({
     ratingId,
     rating

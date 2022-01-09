@@ -1,17 +1,19 @@
+@import '../../../../styles/Variables.scss';
+
 .active {
-    background-color: #6c757d !important;
-    color: #fff !important;
+    background-color: $gray-600 !important;
+    color: $white-100 !important;
     &:hover {
-        background-color: #5c636a !important;
+        background-color: $gray-500 !important;
     }
 }
 
 .ratingButton {
-    background-color: #fff ;
-    border: 1px solid #6c757d ;
-    color: #6c757d ;
+    background-color: $white-100 ;
+    border: 1px solid $gray-600 ;
+    color: $gray-600 ;
     &:hover {
-        background-color: #5c636a;
+        background-color: $gray-500;
     }
     
 }

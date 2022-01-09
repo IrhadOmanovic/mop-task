@@ -1,21 +1,16 @@
+@import '../../../../styles/Variables.scss';
+
 .myFormButton {
   padding: 0 2rem 0 2rem;
   text-align: center;
   border-radius: 10px;
-  background-color: rgba($color: #313638, $alpha: 0.8);
-  color: #F7F6F1;
-  border: 1px solid rgba($color: #313638, $alpha: 0.8);
-  &:hover {
-    border: 1px solid #CC4F2C;
+  background-color: $main-color;
+  color: $text-color;
+  border: 1px solid $gray-400;
+  &:hover, &:active, &:focus {
     text-align: center;
-    background-color: #FF6337;
-    color: #F7F6F1; 
-  }
-  &:active :focus {
-    text-align: center;
-    background-color: #FF6337;
-    color: #F7F6F1; 
-    border:1px solid   #FF6337
+    background-color: $gray-500;
+    color: $white-100; 
   }
 }
 
@@ -23,12 +18,12 @@
   width: 100%;
   margin-top: .25rem;
   font-size: 80%;
-  color: #d1011b;
+  color: $alert;
   font-size: .9rem;
 }
 
 .checkedIcon {
-  color: #FF6337;
+  color: $main-color;
 }
 
 .labelContainer {

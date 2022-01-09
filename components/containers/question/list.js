@@ -59,7 +59,6 @@ QuestionList.propTypes = {
   questions      : PropTypes.array,
   dontShowButton : PropTypes.bool,
   headerTitle    : PropTypes.string,
-  page           : PropTypes.any,
   perPage        : PropTypes.any,
   onClick        : PropTypes.func
 }

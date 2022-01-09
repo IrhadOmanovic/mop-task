@@ -23,7 +23,6 @@ const MyForm = ({
   buttonClassName
 }) => {
   const [isErrorPresent, setIsErrorPresent] = useState(true)
-  const [isSuccessFullSubmition, setIsSuccessFullSubmition] = useState(false)
 
   const renderButton = () => {
     return (
@@ -377,31 +376,28 @@ const MyForm = ({
 
   return (
     <Container>
-      {!isSuccessFullSubmition && (
-        <>
-          {heading && (
-            <Row className='mt-5'>
-              <Col {...formHeadingOptions} className='text-center'>
-                <h2>{heading}</h2>
-              </Col>
-            </Row>
-          )}
-          <Form
-            className='my-3'
-            onSubmit={async (e) => {
-              e.preventDefault()
-              if (!isErrorPresent) {
-                submitFunction()
-                setIsSuccessFullSubmition(true)
-              }
-            }}
-            {...formOptions}
-          >
-            {renderInputs()}
-            {renderButton()}
-          </Form>
-        </>
-      )}
+      <>
+        {heading && (
+        <Row className='mt-5'>
+          <Col {...formHeadingOptions} className='text-center'>
+            <h2>{heading}</h2>
+          </Col>
+        </Row>
+        )}
+        <Form
+          className='my-3'
+          onSubmit={async (e) => {
+            e.preventDefault()
+            if (!isErrorPresent) {
+              submitFunction()
+            }
+          }}
+          {...formOptions}
+        >
+          {renderInputs()}
+          {renderButton()}
+        </Form>
+      </>
     </Container>
   )
 }

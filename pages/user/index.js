@@ -1,7 +1,6 @@
-// import PropTypes from 'prop-types'
-import { useDispatch, useSelector } from 'react-redux'
-import { useSession } from 'next-auth/react'
 import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { getCsrfToken, useSession } from 'next-auth/react'
 import { Button, Card, CardBody, CardGroup, CardHeader, CardText, Container } from 'reactstrap'
 
 import styles from './User.module.scss'
@@ -15,7 +14,6 @@ const generalInfoFormFields = [
     value                : '',
     label                : 'Email',
     type                 : 'email',
-    isRequired           : true,
     description          : 'Your email',
     options              : {
       placeholder: 'someting@your-domain.domain'
@@ -27,7 +25,6 @@ const generalInfoFormFields = [
     value                : '',
     label                : 'ReType Email',
     type                 : 'email',
-    isRequired           : true,
     description          : 'Your email',
     options              : {
       placeholder: 'someting@your-domain.domain'
@@ -72,7 +69,8 @@ const MyProfile = () => {
   const dispatch = useDispatch()
   const { status } = useSession()
 
-  const user = useSelector(state => state?.user)
+  const user = useSelector(state => state.user)
+  const errorMessage = useSelector(state => state.user.message)
   const [activeForm, setActiveForm] = useState(0)
   const [generalInfoForm, setGeneralInfoForm] = useState(generalInfoFormFields)
   const [passwordForm, setPasswordForm] = useState(passwordFormFields)
@@ -95,9 +93,10 @@ const MyProfile = () => {
     }))
   }
 
-  const passwordFormSubmit = () => {
+  const passwordFormSubmit = async () => {
     dispatch(updateUserPassword({
-      password: getFieldByName('user-password', passwordForm).value
+      password  : getFieldByName('user-password', passwordForm).value,
+      csrfToken : await getCsrfToken()
     }))
   }
 
@@ -107,7 +106,7 @@ const MyProfile = () => {
         formState={generalInfoForm}
         setFormState={setGeneralInfoForm}
         submitFunction={generalInfoFormSubmit}
-        heading='Post your answer'
+        heading='Enter new data'
       />
     )
   }
@@ -118,14 +117,19 @@ const MyProfile = () => {
         formState={passwordForm}
         setFormState={setPasswordForm}
         submitFunction={passwordFormSubmit}
-        heading='Post your answer'
+        heading='Enter new password'
       />
     )
   }
 
   const forms = [
-    <div key='1'>{getGeneralInfoForm()}</div>,
-    <div key='2'>{getPasswordForm()}</div>
+    <div key='1'>
+      {getGeneralInfoForm()}
+      {errorMessage !== '' && <div className='text-center text-danger mb-3'>{errorMessage}</div>}
+    </div>,
+    <div key='2'>
+      {getPasswordForm()}
+    </div>
   ]
 
   const renderProfileDetails = () => {
@@ -175,7 +179,7 @@ const MyProfile = () => {
   return (
     <Container>
       {user.email && renderProfileDetails()}
-      {forms[activeForm]}
+      {status === 'authenticated' && user.email && forms[activeForm]}
     </Container>
   )
 }

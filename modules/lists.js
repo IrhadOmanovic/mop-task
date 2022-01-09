@@ -21,21 +21,21 @@ export const listsReducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_LISTS + '_FULFILLED':
       return {
-        ...initialState,
+        ...state,
         latestQuestions        : [...state.latestQuestions, ...action.payload.data],
         latestQuestionsPage    : action.meta.page,
         latestQuestionsPerPage : action.meta.perPage
       }
     case FETCH_MY_QUESTIONS_LISTS + '_FULFILLED':
       return {
-        ...initialState,
+        ...state,
         signedUserQuestions        : [...state.signedUserQuestions, ...action.payload.data],
         signedUserQuestionsPage    : action.meta.page,
         signedUserQuestionsPerPage : action.meta.perPage
       }
     case SET_LIST:
       return {
-        ...initialState,
+        ...state,
         latestQuestions : [...action.data.latestQuestions],
         mostActiveUsers : [...action.data.mostActiveUsers],
         hotQuestions    : [...action.data.hotQuestions]

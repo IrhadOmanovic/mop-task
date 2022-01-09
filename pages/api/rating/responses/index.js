@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
-import { getSession } from 'next-auth/react'
+import { getCsrfToken, getSession } from 'next-auth/react'
 import { createResponseRating, updateRating } from '../../../../app/dao/rating'
 
 export default async function handler (req, res) {
@@ -10,6 +10,11 @@ export default async function handler (req, res) {
     return
   }
   if (req.method === 'PUT') {
+    const csrfToken = await getCsrfToken({ req })
+    if (csrfToken !== req.body.csrfToken) {
+      res.status(200).json({ message: 'Csrf token does not match!', error: true })
+      return
+    }
     try {
       let result
       if (!req.body.ratingId) {

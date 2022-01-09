@@ -7,11 +7,11 @@ const Footer = () => {
   return (
     <footer className={styles.footer}>
       <a
-        href='https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app'
+        href='https://www.linkedin.com/in/irhad-omanovi%C4%87-62a310180/'
         target='_blank'
         rel='noopener noreferrer'
       >
-        Powered by{' '}
+        Made by Irhad omanović
         <span className={styles.logo}>
           <Image src='/vercel.svg' alt='Vercel Logo' width={72} height={16} />
         </span>

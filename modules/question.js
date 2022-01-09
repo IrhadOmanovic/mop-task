@@ -143,26 +143,19 @@ export const updateContentResponse = ({
   })
 }
 
-export const fetchQuestionRating = ({
-  questionId
-}) => dispatch => {
-  return dispatch({
-    type    : FETCH_QUESTION_RATING,
-    payload : axios.get(`../api/rating?questionId=${questionId}`)
-  })
-}
-
 export const createOrUpdateQuestionRating = ({
   rating,
   ratingId,
-  questionId
+  questionId,
+  csrfToken
 }) => dispatch => {
   return dispatch({
     type    : UPDATE_QUESTION_RATING,
     payload : axios.put('../api/rating', {
       rating     : rating,
       ratingId   : ratingId,
-      questionId : questionId
+      questionId : questionId,
+      csrfToken  : csrfToken
     })
   })
 }
@@ -171,14 +164,16 @@ export const createOrUpdateResponseRating = ({
   rating,
   ratingId,
   responseId,
-  index
+  index,
+  csrfToken
 }) => dispatch => {
   return dispatch({
     type    : UPDATE_RESPONSE_RATING,
-    payload : axios.put('../api/rating/response', {
+    payload : axios.put('../api/rating/responses', {
       rating     : rating,
       ratingId   : ratingId,
-      responseId : responseId
+      responseId : responseId,
+      csrfToken  : csrfToken
     }),
     meta: {
       index
