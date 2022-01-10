@@ -17,7 +17,7 @@ const App = ({
   Component,
   pageProps: { session, ...pageProps }
 }) => {
-  const socket = useRef(io(process.env.NEXT_PUBLIC_NOTIFICATION_SERVER_URL))
+  const socket = useRef(io('https://mop-app-notifications-server.herokuapp.com/'))
   return (
     <SessionProvider session={session}>
       <SocketProvider value={socket.current}>
