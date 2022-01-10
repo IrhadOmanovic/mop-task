@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Container } from 'reactstrap'
-import NavigationItem from '../../atoms/navigationitem'
+
+import NavigationItem from '../../atoms/navigationItem'
 
 import classNames from 'classnames'
 
