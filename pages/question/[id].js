@@ -109,7 +109,9 @@ const QuestionDetail = () => {
         socket.emit('sendNotification', {
           senderId   : session.user.id,
           recieverId : question.authorId,
-          type       : 'response'
+          type       : 'response',
+          questionId : question.id,
+          email      : session.user.email
         })
       }
     })

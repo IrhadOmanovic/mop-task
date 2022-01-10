@@ -17,7 +17,6 @@ const App = ({
   Component,
   pageProps: { session, ...pageProps }
 }) => {
-  console.log(process.env.DATABASE_URL)
   const socket = useRef(io(process.env.NEXT_PUBLIC_NOTIFICATION_SERVER_URL))
   return (
     <SessionProvider session={session}>

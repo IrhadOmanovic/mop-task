@@ -8,6 +8,7 @@ import styles from './Header.module.scss'
 import SocketContext from '../../../contexts/socketContext'
 import { handleRouteOnClick } from '../../../../lib/handleRouteOnClick'
 import NavigationContainer from '../../molecules/navigationContainer'
+import WithLink from '../../atoms/withLink'
 
 const Header = () => {
   const router = useRouter()
@@ -56,7 +57,16 @@ const Header = () => {
         </DropdownToggle>
         <DropdownMenu>
           {notifications.map((notification, index) => {
-            return <DropdownItem key={index}>Another Action</DropdownItem>
+            return (
+              <WithLink
+                key={index}
+                location={`/question/${notification.questionId}`}
+              >
+                <DropdownItem key={index}>
+                  {`User ${notification.email} left you a response!`}
+                </DropdownItem>
+              </WithLink>
+            )
           })}
           {notifications.length === 0 && (
           <DropdownItem>No new notifications!</DropdownItem>
