@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Container } from 'reactstrap'
-import ListCard from '../../patterns/atoms/listCard'
+
+import ListCard from '../../atoms/listCard'
 
 const UserList = ({
   users

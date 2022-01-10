@@ -78,7 +78,14 @@ export const questionReducer = (state = initialState, action) => {
     case CREATE_RESPONSE_RATING + '_FULFILLED':{
       const tmp = state.responses
       tmp[action.meta.indexResponse].pending = false
-      const ratings = [...tmp?.[action.meta.indexResponse]?.ratings, action.payload.data]
+
+      let ratings
+      if (!tmp?.[action.meta.indexResponse]?.ratings) {
+        ratings = [action.payload.data]
+      } else {
+        ratings = [...tmp[action.meta.indexResponse].ratings, action.payload.data]
+      }
+
       tmp[action.meta.indexResponse].ratings = ratings
       return {
         ...state,

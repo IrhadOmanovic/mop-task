@@ -1,3 +1,5 @@
+@import '../../../../styles/Variables.scss';
+
 .footer {
   display: flex;
   flex: 1;
@@ -12,9 +14,7 @@
   justify-content: center;
   align-items: center;
   flex-grow: 1;
+  text-decoration: none;
+  color: $main-color;
 }
   
-.logo {
-  height: 1em;
-  margin-left: 0.5rem;
-}

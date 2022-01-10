@@ -1,5 +1,4 @@
 import React from 'react'
-import Image from 'next/image'
 
 import styles from '../footer/Footer.module.scss'
 
@@ -11,10 +10,7 @@ const Footer = () => {
         target='_blank'
         rel='noopener noreferrer'
       >
-        Made by Irhad omanović
-        <span className={styles.logo}>
-          <Image src='/vercel.svg' alt='Vercel Logo' width={72} height={16} />
-        </span>
+        Made by Irhad Omanović
       </a>
     </footer>
   )

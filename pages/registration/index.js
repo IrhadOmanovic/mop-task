@@ -46,13 +46,22 @@ const defaultInputs = [
     type  : 'text'
   },
   {
-    name       : 'register-password',
-    checked    : false,
-    label      : 'Password',
-    type       : 'password',
-    isRequired : true,
-    value      : ''
-
+    name                 : 'register-password',
+    nameOfConnectedField : 'register-password-confirm',
+    checked              : false,
+    label                : 'Password',
+    type                 : 'password',
+    isRequired           : true,
+    value                : ''
+  },
+  {
+    name                 : 'register-password-confirm',
+    nameOfConnectedField : 'register-password',
+    checked              : false,
+    label                : 'ReType password',
+    type                 : 'password',
+    isRequired           : true,
+    value                : ''
   }
 ]
 

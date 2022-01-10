@@ -1,0 +1,8 @@
+@import '../../../../styles/Variables.scss';
+
+.navbarItem {
+    cursor: pointer;
+    &:hover {
+      color: $white-100;
+    }
+  }

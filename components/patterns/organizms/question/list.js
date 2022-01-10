@@ -2,8 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Container } from 'reactstrap'
 
-import ListCard from '../../patterns/atoms/listCard'
-import WithLink from '../../patterns/atoms/withLink'
+import ListCard from '../../atoms/listCard'
+import WithLink from '../../atoms/withLink'
+
+// import ListCard from '../../patterns/atoms/listCard'
 
 const QuestionList = ({
   questions,

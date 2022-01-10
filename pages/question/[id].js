@@ -1,7 +1,6 @@
-import classNames from 'classnames'
 import dayjs from 'dayjs'
 import React, { useContext, useEffect, useState } from 'react'
-import { Button, Card, CardBody, CardSubtitle, CardText, CardTitle, Container, Spinner } from 'reactstrap'
+import { Button, Container, Spinner } from 'reactstrap'
 import { getCsrfToken, useSession } from 'next-auth/react'
 import { useDispatch, useSelector } from 'react-redux'
 import { reduxWrapper } from '@pimred/redux'
@@ -12,18 +11,15 @@ import RatingButtons from '../../components/patterns/molecules/ratingButtons'
 import SocketContext from '../../components/contexts/socketContext'
 import { getQuestion } from '../../app/dao/question'
 import {
-  deleteResponse,
   postResponse,
   setQuestion,
-  updateContentResponse,
   fetchQuestionForSignedUser,
-  createResponseRating,
-  updateResponseRating,
-  deleteResponseRating,
   createQuestionRating,
   updateQuestionRating,
   deleteQuestionRating
 } from '../../modules/question'
+import SpinnersContainer from '../../components/patterns/atoms/spinnersContainer'
+import ResponseList from '../../components/patterns/organizms/response/list'
 
 export const getServerSideProps = reduxWrapper.getServerSideProps(store => async ({ query }) => {
   const data = await getQuestion(parseInt(query.id))
@@ -153,18 +149,6 @@ const QuestionDetail = () => {
     })
   }
 
-  const renderLoadingSpinnersIndicators = () => {
-    if (status === 'loading') {
-      return (
-        <div className='my-2 clearfix'>
-          <div className='float-start'><Spinner /></div>
-          <div className='float-end'><Spinner /></div>
-        </div>
-      )
-    }
-    return null
-  }
-
   const renderQuestionBody = () => {
     return (
       <>
@@ -180,7 +164,6 @@ const QuestionDetail = () => {
                 Post an answer
               </Button>
             )}
-            {!pendingQuestionRating && (
             <RatingButtons
               likeActive={currentUserRating?.rating === true}
               onClickLike={onClickLike}
@@ -188,151 +171,14 @@ const QuestionDetail = () => {
               dislikeActive={currentUserRating?.rating === false}
               likesCount={likes}
               dislikesCount={dislikes}
+              pending={pendingQuestionRating}
+              show
             />
-            )}
-            {pendingQuestionRating && <div className='ms-auto'><Spinner /></div>}
           </div>
         )}
-        {renderLoadingSpinnersIndicators()}
+        <SpinnersContainer />
       </>
     )
-  }
-
-  const onDelete = async (responseId) => {
-    dispatch(deleteResponse({
-      responseId : responseId,
-      csrfToken  : await getCsrfToken()
-    }))
-  }
-
-  const renderEditDeleteButtons = (responseId, index) => {
-    if (status !== 'authenticated') {
-      return null
-    }
-
-    return (
-      <div>
-        <Button
-          onClick={() => {
-            const tmpState = responsesEditForm
-            tmpState[index].show = true
-            setResponsesEditForm([...tmpState])
-          }}
-          className='mx-1 px-3'
-        >
-          Edit
-        </Button>
-        <Button
-          onClick={() => onDelete(responseId)}
-          className='mx-1 px-3'
-        >
-          Delete
-        </Button>
-      </div>
-    )
-  }
-
-  const renderResponses = () => {
-    return responses.map((response, index) => {
-      const hasFirstAndLastname = response?.author?.firstName && response?.author?.lastName
-      const fullNameOrEmail = hasFirstAndLastname ? response?.author?.firstName + ' ' + response?.author?.lastName : response?.author?.email
-
-      const likes = response.ratings?.filter(rating => rating.rating === true).length || 0
-      const dislikes = response.ratings?.length ? response.ratings?.length - likes : 0
-
-      const currentUserRating = response.ratings?.find(rating => rating.authorId === session.user.id)
-      const currentUserRatingindex = response.ratings?.findIndex(rating => rating.authorId === session.user.id)
-
-      const setResponsesState = (newState) => {
-        const tmpState = responsesEditForm
-        tmpState[index].inputs = newState
-
-        setResponsesEditForm([...tmpState])
-      }
-
-      const responseSubmitFunction = async () => {
-        const tmpState = responsesEditForm
-        tmpState[index].show = false
-        setResponsesEditForm([...tmpState])
-
-        dispatch(updateContentResponse({
-          responseId : response.id,
-          csrfToken  : await getCsrfToken(),
-          content    : responsesEditForm[index].inputs[0].value
-        }))
-      }
-
-      const onClickRatingResponse = async ({ rating }) => {
-        if (!currentUserRating) {
-          dispatch(createResponseRating({
-            rating        : rating,
-            responseId    : response.id,
-            csrfToken     : await getCsrfToken(),
-            indexResponse : index
-          }))
-        } else if (currentUserRating.rating === !rating) {
-          dispatch(updateResponseRating({
-            rating        : rating,
-            ratingId      : currentUserRating.id,
-            csrfToken     : await getCsrfToken(),
-            indexResponse : index,
-            indexRating   : currentUserRatingindex
-          }))
-        } else {
-          dispatch(deleteResponseRating({
-            ratingId      : currentUserRating.id,
-            csrfToken     : await getCsrfToken(),
-            indexResponse : index,
-            indexRating   : currentUserRatingindex
-          }))
-        }
-      }
-
-      const onClickLikeResponse = () => {
-        onClickRatingResponse({
-          rating: true
-        })
-      }
-
-      const onClickDislikeResponse = async () => {
-        onClickRatingResponse({
-          rating: false
-        })
-      }
-
-      return (
-        <Card key={response.id} className={classNames('my-3', styles.pointer)}>
-          <CardBody>
-            <CardTitle className={styles.cardTitle}>{`Responded by: ${fullNameOrEmail}`}</CardTitle>
-            <CardSubtitle className={styles.cardSubtitle}>{`Responded at: ${response.createdAt}`}</CardSubtitle>
-            <CardText>{response.content}</CardText>
-            {renderLoadingSpinnersIndicators()}
-            <div className='d-flex'>
-              {session?.user?.email === response?.author?.email && !responsesEditForm?.[index]?.show && renderEditDeleteButtons(response.id, index)}
-              {status === 'authenticated' && !response.pending && (
-              <RatingButtons
-                likeActive={currentUserRating?.rating === true}
-                onClickLike={onClickLikeResponse}
-                onClickDislike={onClickDislikeResponse}
-                dislikeActive={currentUserRating?.rating === false}
-                likesCount={likes}
-                dislikesCount={dislikes}
-              />
-              )}
-              {response.pending && <div className='ms-auto'><Spinner /></div>}
-            </div>
-            {responsesEditForm?.[index]?.show && (
-              <MyForm
-                formState={responsesEditForm[index].inputs}
-                setFormState={setResponsesState}
-                submitFunction={responseSubmitFunction}
-                heading='Enter new text'
-              />
-            )}
-          </CardBody>
-        </Card>
-      )
-    })
   }
 
   if (pending) {
@@ -355,7 +201,8 @@ const QuestionDetail = () => {
           heading='Post your answer'
         />
       )}
-      {renderResponses()}
+      {/* {renderResponses()} */}
+      <ResponseList responses={responses} />
     </Container>
   )
 }

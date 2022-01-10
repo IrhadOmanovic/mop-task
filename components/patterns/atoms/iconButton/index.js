@@ -31,7 +31,7 @@ IconButton.propTypes = {
   active  : PropTypes.bool,
   icon    : PropTypes.any,
   onClick : PropTypes.func,
-  text    : PropTypes.oneOf(['number', 'string'])
+  text    : PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 }
 
 export default IconButton

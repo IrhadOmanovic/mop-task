@@ -1,0 +1,21 @@
+@import '../../../../styles/Variables.scss';
+
+.notifications {
+  border: none !important;
+  background-color: $main-color;
+  padding: 0;
+  font-family: var(--bs-font-sans-serif);
+  font-size: 1rem;
+  color: $text-color;
+  vertical-align: baseline;
+  box-shadow:0 0 0 0.25rem $main-color !important;
+  margin-right: 10px;
+  &:hover, &:focus, &:visited, &:active {
+    background-color: $main-color;
+    border: none;
+  }
+}
+
+.container {
+  background-color: $main-color;
+}

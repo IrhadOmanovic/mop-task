@@ -3,9 +3,9 @@ import { useSession } from 'next-auth/react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Container, Spinner } from 'reactstrap'
 
-import QuestionList from '../../components/containers/question/list'
 import { fetchMyQuestionsLists } from '../../modules/lists'
-import QuestionForm from '../../components/containers/question/form'
+import QuestionForm from '../../components/patterns/organizms/question/form'
+import QuestionList from '../../components/patterns/organizms/question/list'
 
 const MyQuestions = () => {
   const dispatch = useDispatch()

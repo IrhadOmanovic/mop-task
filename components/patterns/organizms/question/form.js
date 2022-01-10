@@ -3,8 +3,8 @@ import { useDispatch } from 'react-redux'
 import { Container } from 'reactstrap'
 import { getCsrfToken, useSession } from 'next-auth/react'
 
-import MyForm from '../../patterns/molecules/form'
-import { addMyQuestion } from '../../../modules/lists'
+import MyForm from '../../../patterns/molecules/form'
+import { addMyQuestion } from '../../../../modules/lists'
 
 const defaultInputs = [
   {
