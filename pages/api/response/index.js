@@ -26,7 +26,6 @@ export default async function handler (req, res) {
 
       res.status(200).json(newResponse)
     } catch (error) {
-      console.log(error)
       res.status(500).json({ error: 'Unable to connect to the database!' })
     }
   } else if (req.method === 'DELETE') {
@@ -37,7 +36,6 @@ export default async function handler (req, res) {
 
       res.status(200).json(deletedResult)
     } catch (error) {
-      console.log(error)
       res.status(500).json({ error: 'Unable to connect to the database!' })
     }
   } else if (req.method === 'PATCH') {
@@ -49,7 +47,6 @@ export default async function handler (req, res) {
 
       res.status(200).json(newResponse)
     } catch (error) {
-      console.log(error)
       res.status(500).json({ error: 'Unable to connect to the database!' })
     }
   }

@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card, CardBody, CardSubtitle, CardText, CardTitle } from 'reactstrap'
 import { getCsrfToken, useSession } from 'next-auth/react'
 import { useDispatch } from 'react-redux'
@@ -44,6 +44,19 @@ const ResponseList = ({
   })
 
   const [responsesEditForm, setResponsesEditForm] = useState(initialResponsesEditFormState)
+
+  useEffect(() => {
+    if (responses.length > responsesEditForm.length) {
+      const tmp = JSON.parse(JSON.stringify(defaultInputs))
+      tmp[0].name = responses[responses.length - 1].id
+      const newElement = {
+        id     : responses[responses.length - 1].id,
+        show   : false,
+        inputs : tmp
+      }
+      setResponsesEditForm([...responsesEditForm, newElement])
+    }
+  }, [responses])
 
   const onEditClick = (index) => {
     const tmpState = responsesEditForm

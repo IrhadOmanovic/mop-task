@@ -19,7 +19,7 @@ const IconButton = ({
       onClick={() => onClick()}
     >
       <div>
-        <FontAwesomeIcon className='me-2' icon={icon} />
+        <FontAwesomeIcon data-testid='IconButton-icon' className='me-2' icon={icon} />
         {text}
       </div>
     </Button>

@@ -14,7 +14,8 @@ const Login = () => {
       isRequired  : true,
       description : 'Your email',
       options     : {
-        placeholder: 'someting@your-domain.domain'
+        placeholder   : 'someting@your-domain.domain',
+        'data-testid' : 'login-email'
       }
     },
     {
@@ -23,8 +24,10 @@ const Login = () => {
       label      : 'Password',
       type       : 'password',
       isRequired : true,
-      value      : ''
-
+      value      : '',
+      options    : {
+        'data-testid': 'login-password'
+      }
     }
   ]
   const [formErrorMessage, setFormErrorMessage] = useState('')

@@ -13,6 +13,11 @@ export default async function handler (req, res) {
 
     const session = await getSession({ req })
 
+    if (!session) {
+      res.status(200).json({ message: 'User is not logged in', error: true })
+      return
+    }
+
     try {
       const newQuestion = await createQuestion({
         title   : req.body.title,
@@ -22,7 +27,6 @@ export default async function handler (req, res) {
 
       res.status(200).json(newQuestion)
     } catch (error) {
-      console.log(error)
       res.status(500).json({ error: 'Unable to connect to the database!' })
     }
   } else if (req.method === 'GET') {
@@ -42,7 +46,6 @@ export default async function handler (req, res) {
 
       res.status(200).json(result)
     } catch (error) {
-      console.log(error)
       res.status(500).json({ error: 'Unable to connect to the database!' })
     }
   }

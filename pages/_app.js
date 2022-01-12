@@ -8,7 +8,7 @@ import { useRef } from 'react'
 
 import Header from '../components/patterns/organizms/header'
 import Footer from '../components/patterns/organizms/footer'
-import { SocketProvider } from '../components/contexts/socketContext'
+import { SocketProvider } from '../lib/contexts/socketContext'
 
 import '@fortawesome/fontawesome-svg-core/styles.css'
 config.autoAddCss = false
@@ -17,7 +17,7 @@ const App = ({
   Component,
   pageProps: { session, ...pageProps }
 }) => {
-  const socket = useRef(io('https://mop-app-notifications-server.herokuapp.com/'))
+  const socket = useRef(io(process.env.NEXT_PUBLIC_NOTIFICATION_SERVER_URL))
   return (
     <SessionProvider session={session}>
       <SocketProvider value={socket.current}>

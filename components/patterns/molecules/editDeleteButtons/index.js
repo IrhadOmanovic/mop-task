@@ -5,7 +5,8 @@ import { Button } from 'reactstrap'
 
 const EditDeleteButtons = ({
   onDeleteClick,
-  onEditClick, show
+  onEditClick,
+  show
 }) => {
   const { status } = useSession()
 
@@ -14,7 +15,7 @@ const EditDeleteButtons = ({
   }
 
   return (
-    <div>
+    <div data-testid='EditDeleteButtons-container'>
       <Button
         onClick={() => onEditClick()}
         className='mx-1 px-3'

@@ -21,8 +21,6 @@ module.exports = {
       newResponse.createdAt = newResponse.createdAt.toString()
 
       return newResponse
-    } catch (error) {
-      return { error: 'Unable to connect to the database!' }
     } finally {
       prisma.$disconnect()
     }
@@ -37,8 +35,6 @@ module.exports = {
       })
 
       return { deleteResult }
-    } catch (error) {
-      return { error: 'Unable to connect to the database!' }
     } finally {
       prisma.$disconnect()
     }
@@ -61,8 +57,6 @@ module.exports = {
       updatedResult.createdAt = updatedResult.createdAt.toString()
 
       return updatedResult
-    } catch (error) {
-      return { error: 'Unable to connect to the database!' }
     } finally {
       prisma.$disconnect()
     }

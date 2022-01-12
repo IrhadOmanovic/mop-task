@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { getCsrfToken } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
@@ -18,8 +18,10 @@ const defaultInputs = [
     isRequired           : true,
     description          : 'Your email',
     options              : {
-      placeholder: 'someting@your-domain.domain'
+      placeholder   : 'someting@your-domain.domain',
+      'data-testid' : 'register-email'
     }
+
   },
   {
     name                 : 'register-email-confirm',
@@ -30,20 +32,27 @@ const defaultInputs = [
     isRequired           : true,
     description          : 'Your email',
     options              : {
-      placeholder: 'someting@your-domain.domain'
+      placeholder   : 'someting@your-domain.domain',
+      'data-testid' : 'register-email-confirm'
     }
   },
   {
-    name  : 'register-first-name',
-    value : '',
-    label : 'First name',
-    type  : 'text'
+    name    : 'register-first-name',
+    value   : '',
+    label   : 'First name',
+    type    : 'text',
+    options : {
+      'data-testid': 'register-first-name'
+    }
   },
   {
-    name  : 'register-last-name',
-    value : '',
-    label : 'Last name:',
-    type  : 'text'
+    name    : 'register-last-name',
+    value   : '',
+    label   : 'Last name:',
+    type    : 'text',
+    options : {
+      'data-testid': 'register-last-name'
+    }
   },
   {
     name                 : 'register-password',
@@ -52,7 +61,10 @@ const defaultInputs = [
     label                : 'Password',
     type                 : 'password',
     isRequired           : true,
-    value                : ''
+    value                : '',
+    options              : {
+      'data-testid': 'register-password'
+    }
   },
   {
     name                 : 'register-password-confirm',
@@ -61,9 +73,14 @@ const defaultInputs = [
     label                : 'ReType password',
     type                 : 'password',
     isRequired           : true,
-    value                : ''
+    value                : '',
+    options              : {
+      'data-testid': 'register-password-confirm'
+    }
   }
 ]
+
+const passwordErrorMessage = 'Password must be at least of 5 characters size!'
 
 const Registration = () => {
   const errorMessage = useSelector(store => store.user?.message)
@@ -71,6 +88,15 @@ const Registration = () => {
   const [formErrorMessage, setFormErrorMessage] = useState('')
   const dispatch = useDispatch()
   const router = useRouter()
+
+  useEffect(() => {
+    if (formErrorMessage === passwordErrorMessage) {
+      const timer = setTimeout(() => {
+        setFormErrorMessage('')
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [formErrorMessage])
 
   const getFieldByName = (name) => {
     return formState.find(field => field.name === name)
@@ -85,7 +111,7 @@ const Registration = () => {
     const passwordFieldValue = getFieldByName('register-password').value
 
     if (passwordFieldValue.length < 5) {
-      setFormErrorMessage('Password must be at least of 5 characters size!')
+      setFormErrorMessage(passwordErrorMessage)
       return
     }
 

@@ -30,7 +30,6 @@ export default async function handler (req, res) {
       })
       res.status(200).json({ message: 'Sucessful registration!', error: false })
     } catch (error) {
-      console.log(error)
       res.status(500).json({ message: 'Unable to connect to the database!', error: true })
     }
   }

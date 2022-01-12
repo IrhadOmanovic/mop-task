@@ -16,11 +16,11 @@ const providers = [
       let user
       try {
         user = await fetchUser({
-          email          : req.body.email,
+          email          : credentials.email,
           returnPassword : true
         })
       } catch (error) {
-        console.log(error)
+        return null
       }
 
       if (user) {

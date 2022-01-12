@@ -18,9 +18,6 @@ module.exports = {
       })
 
       return tmp
-    } catch (error) {
-      console.log(error)
-      return { error: 'Unable to connect to the database!' }
     } finally {
       prisma.$disconnect()
     }
@@ -58,9 +55,6 @@ module.exports = {
       })
 
       return tmp
-    } catch (error) {
-      console.log(error)
-      return { error: 'Unable to connect to the database!' }
     } finally {
       prisma.$disconnect()
     }
@@ -93,8 +87,6 @@ module.exports = {
       question.createdAt = question.createdAt.toString()
 
       return question
-    } catch (error) {
-      return { error: 'Unable to connect to the database!' }
     } finally {
       prisma.$disconnect()
     }
@@ -115,9 +107,6 @@ module.exports = {
       result.createdAt = result.createdAt.toString()
 
       return result
-    } catch (error) {
-      console.log(error)
-      return { error: 'Unable to connect to the database!' }
     } finally {
       prisma.$disconnect()
     }
@@ -150,9 +139,6 @@ module.exports = {
       })
 
       return result
-    } catch (error) {
-      console.log(error)
-      return { error: 'Unable to connect to the database!' }
     } finally {
       prisma.$disconnect()
     }
@@ -183,9 +169,6 @@ module.exports = {
       })
 
       return tmp
-    } catch (error) {
-      console.log(error)
-      return { error: 'Unable to connect to the database!' }
     } finally {
       prisma.$disconnect()
     }

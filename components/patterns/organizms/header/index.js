@@ -5,10 +5,10 @@ import { useSelector } from 'react-redux'
 import { Container, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap'
 
 import styles from './Header.module.scss'
-import SocketContext from '../../../contexts/socketContext'
-import { handleRouteOnClick } from '../../../../lib/handleRouteOnClick'
 import NavigationContainer from '../../molecules/navigationContainer'
 import WithLink from '../../atoms/withLink'
+import SocketContext from '../../../../lib/contexts/socketContext'
+import { handleRouteOnClick } from '../../../../lib/handleRouteOnClick'
 
 const Header = () => {
   const router = useRouter()

@@ -8,7 +8,6 @@ import { reduxWrapper } from '@pimred/redux'
 import MyForm from '../../components/patterns/molecules/form'
 import styles from './Question.module.scss'
 import RatingButtons from '../../components/patterns/molecules/ratingButtons'
-import SocketContext from '../../components/contexts/socketContext'
 import { getQuestion } from '../../app/dao/question'
 import {
   postResponse,
@@ -20,6 +19,7 @@ import {
 } from '../../modules/question'
 import SpinnersContainer from '../../components/patterns/atoms/spinnersContainer'
 import ResponseList from '../../components/patterns/organizms/response/list'
+import SocketContext from '../../lib/contexts/socketContext'
 
 export const getServerSideProps = reduxWrapper.getServerSideProps(store => async ({ query }) => {
   const data = await getQuestion(parseInt(query.id))
