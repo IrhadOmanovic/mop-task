@@ -35,4 +35,4 @@ yarn-error.log*
 
 .env.local
 
-/prisma/env
+/prisma/.env
