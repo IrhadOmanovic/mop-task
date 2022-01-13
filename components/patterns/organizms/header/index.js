@@ -26,9 +26,16 @@ const Header = () => {
 
   useEffect(() => {
     socket?.on('getNotifications', data => {
-      setNotifications((prev) => [...prev, data])
+      setNotifications([...data])
     })
   }, [socket])
+
+  const deleteNotification = (indexNotification) => {
+    const temp = notifications
+    temp.splice(indexNotification, 1)
+    setNotifications([...temp])
+    socket?.emit('deleteNotification', { userId: session.user.id, indexNotification: indexNotification })
+  }
 
   const leftNavItems = [
     {
@@ -62,7 +69,7 @@ const Header = () => {
                 key={index}
                 location={`/question/${notification.questionId}`}
               >
-                <DropdownItem key={index}>
+                <DropdownItem onClick={() => deleteNotification(index)} key={index}>
                   {`User ${notification.email} left you a response!`}
                 </DropdownItem>
               </WithLink>
