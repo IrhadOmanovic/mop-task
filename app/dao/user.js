@@ -25,7 +25,6 @@ module.exports = {
         user.updatedAt = user.updatedAt.toString()
         return user
       })
-      //   newResponse.createdAt = newResponse.createdAt.toString()
 
       return temp
     } finally {

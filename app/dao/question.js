@@ -25,36 +25,71 @@ module.exports = {
   getHotestQuestions: async (page = 0, perPage = 20) => {
     const prisma = DBClient.getInstance().prisma
     try {
-      const results = await prisma.question.findMany({
-        skip    : page * perPage,
-        take    : perPage,
-        orderBy : {
-          ratings: {
-            _count: 'desc'
+      // Ovaj query bi bio idealan još samo da se može u selectu navesti i čitav question, tj da se može u select staviti i question
+      // Drugo šta se može uraditi jeste da koristimo include, međutim, ako koristimo group by onda ne možemo koristiti include
+      // Tako da sam morao prvo da dohvatim id pitanja sa najviše pozitivnih recenzija, a zatim da dohvatim pitanja sa tim id-evima
+      // i potom da ih sortiram po broju pozitivnih recenzija
+      const questionsIdsSorted = await prisma.rating.groupBy({
+        by    : ['questionId'],
+        where : {
+          rating : true,
+          NOT    : [{ questionId: null }]
+        },
+        _count: {
+          rating: true
+        },
+        orderBy: {
+          _count: {
+            rating: 'desc'
           }
         },
-        include: {
-          ratings: {
+        take: 20
+      })
+
+      const tempArray = questionsIdsSorted.map(element => element.questionId)
+
+      // Problem koji se javio ovdje jeste što nisam u mogućnosti da sortiram rezultate dobijene iz sljedeće funkcije
+      // Sortiranje je trebalo da bude izvršeno po count ratinga iz selecta, međutim ako se uradi order by count ratings
+      // On će vršiti prebrojavanje po svim ocjenama a ne samo onim koje su pozitivne
+
+      // Problem je što se ne može ni specifirati uslov za count -> tipa prebroji samo one responses koji imaju response === true
+      const results = await prisma.question.findMany({
+        where: {
+          id: {
+            in: tempArray
+          }
+        },
+        select: {
+          id        : true,
+          title     : true,
+          content   : true,
+          createdAt : true,
+          // author    : true,
+          authorId  : true,
+          // responses : true,
+          ratings   : {
             where: {
               rating: true
             }
           }
-        },
-        where: {
-          ratings: {
-            some: {
-              rating: true
-            }
-          }
+
         }
       })
 
-      const tmp = results.map(x => {
+      results.sort((first, second) => {
+        if (first.ratings.length > second.ratings.length) {
+          return -1
+        } else {
+          return 1
+        }
+      })
+
+      const filteredResult = results.map(x => {
         x.createdAt = x.createdAt.toString()
         return x
       })
 
-      return tmp
+      return filteredResult
     } finally {
       prisma.$disconnect()
     }
